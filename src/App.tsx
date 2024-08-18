@@ -9,15 +9,28 @@ import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import ImageModal from './components/ImageModal/ImageModal';
 import './App.css';
 
+interface Image {
+    id: string;
+    urls: {
+        small: string;
+        regular: string;
+    };
+    alt_description: string;
+    description?: string;
+    user: {
+        name: string;
+    };
+}
+
 const API_KEY = 'wbB7YEXF0pq-3PWq_kDrvmAaoaKHr6r5vdEDCtH8JK0';
 
-const App = () => {
-    const [images, setImages] = useState([]);
-    const [query, setQuery] = useState('');
-    const [page, setPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [selectedImage, setSelectedImage] = useState(null);
+const App: React.FC = () => {
+    const [images, setImages] = useState<Image[]>([]);
+    const [query, setQuery] = useState<string>('');
+    const [page, setPage] = useState<number>(1);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 
     useEffect(() => {
         if (!query) return;
@@ -53,7 +66,7 @@ const App = () => {
         fetchImages();
     }, [query, page]);
 
-    const handleSearch = (newQuery) => {
+    const handleSearch = (newQuery: string) => {
         setQuery(newQuery);
         setImages([]);
         setPage(1);
@@ -63,7 +76,7 @@ const App = () => {
         setPage(prevPage => prevPage + 1);
     };
 
-    const openModal = (image) => {
+    const openModal = (image: Image) => {
         setSelectedImage(image);
     };
 
@@ -72,18 +85,14 @@ const App = () => {
     };
 
     return (
-        <div className="App">
+        <div className="app">
             <SearchBar onSubmit={handleSearch} />
             {error && <ErrorMessage message={error} />}
-            {images.length > 0 && (
-                <ImageGallery images={images} onImageClick={openModal} />
-            )}
+            <ImageGallery images={images} onImageClick={openModal} />
             {isLoading && <Loader />}
-            {images.length > 0 && !isLoading && (
-                <LoadMoreBtn onClick={loadMoreImages} />
-            )}
+            {images.length > 0 && !isLoading && <LoadMoreBtn onClick={loadMoreImages} />}
             <ImageModal isOpen={!!selectedImage} onClose={closeModal} image={selectedImage} />
-            <Toaster position="top-right" />
+            <Toaster />
         </div>
     );
 };
